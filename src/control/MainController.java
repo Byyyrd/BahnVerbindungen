@@ -1,10 +1,9 @@
 package control;
 
-import model.Edge;
-import model.Graph;
-import model.List;
-import model.Vertex;
+import model.*;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Objects;
 
 public class MainController {
@@ -198,9 +197,13 @@ public class MainController {
         Vertex station01 = trainNetwork.getVertex(name01);
         Vertex station02 = trainNetwork.getVertex(name02);
         if (station01 != null && station02 != null) {
-            //TODO 13: Schreibe einen Algorithmus, der mindestens eine Verbindung von einer Station (über ggf. Zwischenstationen) zu einer anderen Station bestimmt. Happy Kopfzerbrechen!
+            //COMPLETE 13: Schreibe einen Algorithmus, der mindestens eine Verbindung von einer Station (über ggf. Zwischenstationen) zu einer anderen Station bestimmt. Happy Kopfzerbrechen!
             trainNetwork.setAllVertexMarks(false);
-            return getLinksRec(name02, station01).split(",");
+            String[] result = getLinksRec(name02, station01).split(",");
+            if(result.length == 0){
+                return null;
+            }
+            return result;
         }
         return null;
     }
@@ -236,9 +239,88 @@ public class MainController {
         Vertex station01 = trainNetwork.getVertex(name01);
         Vertex station02 = trainNetwork.getVertex(name02);
         if (station01 != null && station02 != null) {
+            trainNetwork.setAllVertexMarks(false);
+            String[] result = dijkstra(station01,station02).split(",");
+            if(result.length <= 1){
+                return null;
+            }
+            return result;
             //TODO 14: Schreibe einen Algorithmus, der die kürzeste Verbindung zwischen den Stationen name01 und name02 als String-Array zurückgibt. Beachte die Kantengewichte!
         }
         return null;
+    }
+    private String dijkstra(Vertex start,Vertex end)
+    {
+        List<Vertex> vertices = trainNetwork.getVertices();
+        int length = countList(vertices);
+        Vertex[][] stations = new Vertex[length][2];
+        double[] lengths = new double[length];
+        vertices.toFirst();
+        for (int i = 0; i < length; i++) {
+            stations[i][0] = vertices.getContent();
+            lengths[i] = Integer.MAX_VALUE;
+            if(vertices.getContent() == start){
+                lengths[i] = 0;
+            }
+            vertices.next();
+        }
+        int smallest = findSmallest(stations,lengths);
+        while (smallest != -1){
+            Vertex currentVertex = stations[smallest][0];
+            currentVertex.setMark(true);
+            List<Vertex> neighbours = trainNetwork.getNeighbours(currentVertex);
+            neighbours.toFirst();
+            int currentIndex = getIndex(stations,currentVertex);
+            if(currentIndex != -1){
+                double lengthToCurrent = lengths[currentIndex];
+                while (neighbours.hasAccess()){
+                    int index = getIndex(stations,neighbours.getContent());
+                    if(index != -1){
+                        double pathLength = lengths[index];
+                        if(lengthToCurrent + trainNetwork.getEdge(neighbours.getContent(),currentVertex).getWeight() < pathLength){
+                            lengths[index] = lengthToCurrent + trainNetwork.getEdge(neighbours.getContent(),currentVertex).getWeight();
+                            stations[index][1] = currentVertex;
+                        }
+                    }
+                    neighbours.next();
+                }
+            }
+            smallest = findSmallest(stations,lengths);
+        }
+        Stack<String> path = new Stack<>();
+        Vertex previous = stations[getIndex(stations,end)][1];
+        path.push(end.getID());
+        while (previous != null){
+            path.push(previous.getID());
+            previous = stations[getIndex(stations,previous)][1];
+        }
+        StringBuilder result = new StringBuilder();
+        while (!path.isEmpty()){
+            result.append(path.top()).append(",");
+            path.pop();
+        }
+        result.replace(result.length() - 1,result.length(),"");
+        return result.toString();
+    }
+    private int findSmallest(Vertex[][] stations,double[] lengths){
+        int shortestIndex = 0;
+        for (int i = 0; i < stations.length; i++) {
+            if(lengths[i] < lengths[shortestIndex] && !stations[i][0].isMarked()){
+                shortestIndex = i;
+            }
+        }
+        if(stations[0][0].isMarked()){
+            return -1;
+        }
+        return shortestIndex;
+    }
+    private int getIndex(Vertex[][] vertices,Vertex vertex){
+        for (int i = 0; i < vertices.length; i++) {
+            if(vertices[i][0].getID().equals(vertex.getID())){
+                return i;
+            }
+        }
+        return -1;
     }
 
     private int countList(List list) {
