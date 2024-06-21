@@ -158,9 +158,6 @@ public class MainController {
         //COMPLETE 11: Freundschaften beenden.
         Vertex vertex1 = trainNetwork.getVertex(name01);
         Vertex vertex2 = trainNetwork.getVertex(name02);
-        if (vertex1 == null && vertex2 == null) {
-            return false;
-        }
         Edge edge = trainNetwork.getEdge(vertex1, vertex2);
         if (edge != null) {
             trainNetwork.removeEdge(edge);
@@ -177,9 +174,12 @@ public class MainController {
      */
     public double dense() {
         //COMPLETE 12: Dichte berechnen.
+        if(trainNetwork.isEmpty()){
+            return 0;
+        }
         int edgeCount = countList(trainNetwork.getEdges());
         int possibleConnections = sum(countList(trainNetwork.getVertices()) - 1);
-        if (possibleConnections <= 0) {
+        if (possibleConnections == 0) {
             return 0;
         }
         return (double) edgeCount / possibleConnections;
@@ -210,19 +210,19 @@ public class MainController {
 
     private String getLinksRec(String destination, Vertex vertex) {
         vertex.setMark(true);
-        List<Vertex> vertices = trainNetwork.getNeighbours(vertex);
-        vertices.toFirst();
-        while (vertices.hasAccess()) {
-            if (vertices.getContent().getID().equals(destination)) {
+        List<Vertex> neighbours = trainNetwork.getNeighbours(vertex);
+        neighbours.toFirst();
+        while (neighbours.hasAccess()) {
+            if (neighbours.getContent().getID().equals(destination)) {
                 return vertex.getID() + "," + destination;
             }
-            if (!vertices.getContent().isMarked()) {
-                String path = getLinksRec(destination, vertices.getContent());
+            if (!neighbours.getContent().isMarked()) {
+                String path = getLinksRec(destination, neighbours.getContent());
                 if (!path.isEmpty()) {
                     return vertex.getID() + "," + path;
                 }
             }
-            vertices.next();
+            neighbours.next();
         }
         return "";
     }
@@ -245,7 +245,7 @@ public class MainController {
                 return null;
             }
             return result;
-            //TODO 14: Schreibe einen Algorithmus, der die kürzeste Verbindung zwischen den Stationen name01 und name02 als String-Array zurückgibt. Beachte die Kantengewichte!
+            //COMPLETE 14: Schreibe einen Algorithmus, der die kürzeste Verbindung zwischen den Stationen name01 und name02 als String-Array zurückgibt. Beachte die Kantengewichte!
         }
         return null;
     }
@@ -256,6 +256,7 @@ public class MainController {
         Vertex[][] stations = new Vertex[length][2];
         double[] lengths = new double[length];
         vertices.toFirst();
+        //Fill stations array and init shortest paths to infinity
         for (int i = 0; i < length; i++) {
             stations[i][0] = vertices.getContent();
             lengths[i] = Integer.MAX_VALUE;
@@ -264,19 +265,25 @@ public class MainController {
             }
             vertices.next();
         }
+        //Choose Node with the shortest path until all are marked
         int smallest = findSmallest(stations,lengths);
         while (smallest != -1){
+            //Markiere Vertex und speichere seine Nachbarn
             Vertex currentVertex = stations[smallest][0];
             currentVertex.setMark(true);
             List<Vertex> neighbours = trainNetwork.getNeighbours(currentVertex);
             neighbours.toFirst();
+            //Finde raus an welcher Stelle der Vertex im Array ist
             int currentIndex = getIndex(stations,currentVertex);
+            //Wenn der Vertex gefunden wurde
             if(currentIndex != -1){
                 double lengthToCurrent = lengths[currentIndex];
+                //Gehe alle Nachbarn durch
                 while (neighbours.hasAccess()){
                     int index = getIndex(stations,neighbours.getContent());
                     if(index != -1){
                         double pathLength = lengths[index];
+                        //Wenn der aktuell kürzeste Weg zum Nachbar länger ist als der Weg zum Aktuellen Knoten + Weg zum Nachbar, dann wird der zweite Weg zum neuen kürzesten Weg
                         if(lengthToCurrent + trainNetwork.getEdge(neighbours.getContent(),currentVertex).getWeight() < pathLength){
                             lengths[index] = lengthToCurrent + trainNetwork.getEdge(neighbours.getContent(),currentVertex).getWeight();
                             stations[index][1] = currentVertex;
@@ -285,6 +292,7 @@ public class MainController {
                     neighbours.next();
                 }
             }
+            //Nächsten aktuellen Knoten finden
             smallest = findSmallest(stations,lengths);
         }
         Stack<String> path = new Stack<>();
@@ -336,5 +344,5 @@ public class MainController {
     private int sum(int i) {
         return (i * (i + 1)) / 2;
     }
-
+//
 }
