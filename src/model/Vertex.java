@@ -50,4 +50,8 @@ public class Vertex{
         return mark;
     }
 
+    @Override
+    public String toString() {
+        return id;
+    }
 }

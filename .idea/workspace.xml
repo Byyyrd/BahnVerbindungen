@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a03d3af0-4483-4db4-ba1d-39cc83fdf008" name="Default Changelist" comment="Dijstra Crzy">
+    <list default="true" id="a03d3af0-4483-4db4-ba1d-39cc83fdf008" name="Default Changelist" comment="Minor Improvement">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/control/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/control/MainController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/model/Vertex.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/model/Vertex.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,7 +103,8 @@
       <workItem from="1718351914856" duration="5301000" />
       <workItem from="1718604364664" duration="1239000" />
       <workItem from="1718790201542" duration="5192000" />
-      <workItem from="1718956546214" duration="4180000" />
+      <workItem from="1718956546214" duration="4211000" />
+      <workItem from="1719208836432" duration="4760000" />
     </task>
     <task id="LOCAL-00001" summary="Init">
       <created>1718040811892</created>
@@ -155,7 +157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1718795343390</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Minor Improvement">
+      <option name="closed" value="true" />
+      <created>1718961819667</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1718961819667</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -178,7 +188,8 @@
     </ignored-roots>
     <MESSAGE value="Init" />
     <MESSAGE value="Dijstra Crzy" />
-    <option name="LAST_COMMIT_MESSAGE" value="Dijstra Crzy" />
+    <MESSAGE value="Minor Improvement" />
+    <option name="LAST_COMMIT_MESSAGE" value="Minor Improvement" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

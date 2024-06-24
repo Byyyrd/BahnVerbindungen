@@ -22,12 +22,20 @@ public class MainController {
      * Fügt Stationen dem Bahnnetzwerk hinzu.
      */
     private void createSomeStations() {
-        insertStation("Dortmund");
-        insertStation("Münster");
+        insertStation("Röckrath");
         insertStation("Bochum");
-        insertStation("Berlin");
+        insertStation("Münster");
+        insertStation("Dortmund");
+        insertStation("Dinslaken");
+        insertStation("Tespe");
+        insertStation("Katzenelnbogen");
         connect("Dortmund", "Münster", 60);
+        connect("Bochum", "Münster", 60);
         connect("Dortmund", "Bochum", 15);
+        connect("Röckrath", "Bochum", 70);
+        connect("Dinslaken", "Dortmund", 90);
+        connect("Tespe", "Münster", 80);
+        connect("Tespe", "Katzenelnbogen", 20);
     }
 
     /**
@@ -267,13 +275,13 @@ public class MainController {
         }
         //Choose Node with the shortest path until all are marked
         int smallest = findSmallest(stations,lengths);
-        while (smallest != -1){
+        while (smallest != -1 && hasVerticesUnderInfinity(lengths)){
             //Markiere Vertex und speichere seine Nachbarn
             Vertex currentVertex = stations[smallest][0];
             currentVertex.setMark(true);
             List<Vertex> neighbours = trainNetwork.getNeighbours(currentVertex);
             neighbours.toFirst();
-            //Finde raus an welcher Stelle der Vertex im Array ist
+            //Finde raus, an welcher Stelle der Vertex im Array ist
             int currentIndex = getIndex(stations,currentVertex);
             //Wenn der Vertex gefunden wurde
             if(currentIndex != -1){
@@ -284,7 +292,7 @@ public class MainController {
                     if(index != -1){
                         double pathLength = lengths[index];
                         //Wenn der aktuell kürzeste Weg zum Nachbar länger ist als der Weg zum Aktuellen Knoten + Weg zum Nachbar, dann wird der zweite Weg zum neuen kürzesten Weg
-                        if(lengthToCurrent + trainNetwork.getEdge(neighbours.getContent(),currentVertex).getWeight() < pathLength){
+                        if(!neighbours.getContent().isMarked() && lengthToCurrent + trainNetwork.getEdge(neighbours.getContent(),currentVertex).getWeight() < pathLength){
                             lengths[index] = lengthToCurrent + trainNetwork.getEdge(neighbours.getContent(),currentVertex).getWeight();
                             stations[index][1] = currentVertex;
                         }
@@ -295,6 +303,7 @@ public class MainController {
             //Nächsten aktuellen Knoten finden
             smallest = findSmallest(stations,lengths);
         }
+        System.out.println(lengths[getIndex(stations,end)]);
         Stack<String> path = new Stack<>();
         Vertex previous = stations[getIndex(stations,end)][1];
         path.push(end.getID());
@@ -312,15 +321,25 @@ public class MainController {
     }
     private int findSmallest(Vertex[][] stations,double[] lengths){
         int shortestIndex = 0;
+        double smallest = Double.POSITIVE_INFINITY;
         for (int i = 0; i < stations.length; i++) {
-            if(lengths[i] < lengths[shortestIndex] && !stations[i][0].isMarked()){
+            if(lengths[i] < smallest && !stations[i][0].isMarked()){
                 shortestIndex = i;
+                smallest = lengths[shortestIndex];
             }
         }
-        if(stations[0][0].isMarked()){
+        if(shortestIndex == 0 && stations[0][0].isMarked()){
             return -1;
         }
         return shortestIndex;
+    }
+    private boolean hasVerticesUnderInfinity(double[] lengths){
+        for (double length : lengths) {
+            if(length < Double.POSITIVE_INFINITY){
+                return true;
+            }
+        }
+        return false;
     }
     private int getIndex(Vertex[][] vertices,Vertex vertex){
         for (int i = 0; i < vertices.length; i++) {
